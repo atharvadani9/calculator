@@ -1,8 +1,19 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import logo from "./logo.svg";
+import { pingAPI } from "./services/api";
 
 function App() {
+  const ping = async () => {
+    try {
+      const response = await pingAPI();
+      console.log(response.message);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  ping();
+
   return (
     <div className="App">
       <header className="App-header">

@@ -13,8 +13,8 @@ type CalculatorHandler struct {
 }
 
 type CalculatorResponse struct {
-	Result float64 `json:"result"`
-	// Error  error   `json:"error,omitempty"`
+	Result float64 `json:"result,omitempty"`
+	Error  string  `json:"error,omitempty"`
 }
 
 func NewCalculatorHandler(logger *log.Logger) *CalculatorHandler {
@@ -25,33 +25,32 @@ func NewCalculatorHandler(logger *log.Logger) *CalculatorHandler {
 
 func (h *CalculatorHandler) HandleCalculate(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		h.writeResponse(w, CalculatorResponse{Error: "Method not allowed"})
 		return
 	}
 
 	var req calculator.Calculator
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		h.logger.Printf("ERROR: Failed to decode request: %v", err)
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		h.writeResponse(w, CalculatorResponse{Error: "Invalid JSON"})
 		return
 	}
 
 	result, err := req.Calculate()
-
 	if err != nil {
 		h.logger.Printf("ERROR: Failed to calculate: %v", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.writeResponse(w, CalculatorResponse{Error: err.Error()})
 		return
 	}
 
-	response := CalculatorResponse{
-		Result: result,
-	}
+	response := CalculatorResponse{Result: result}
+	h.writeResponse(w, response)
+	h.logger.Printf("INFO: Response: %v", response)
+}
 
+func (h *CalculatorHandler) writeResponse(w http.ResponseWriter, response CalculatorResponse) {
 	if err := utils.WriteJSON(w, response); err != nil {
+		h.logger.Printf("ERROR: Failed to write response: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		h.logger.Printf("ERROR: Failed to encode response: %v", err)
-		return
 	}
-	h.logger.Printf("INFO: Calculation result: %v", response)
 }

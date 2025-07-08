@@ -1,18 +1,23 @@
 import "./App.css";
 import logo from "./logo.svg";
-import { pingAPI } from "./services/api";
+import { calculateAPI } from "./services/api";
 
 function App() {
-  const ping = async () => {
-    try {
-      const response = await pingAPI();
-      console.log(response.message);
-    } catch (error) {
-      console.error(error);
+  const data = {
+    operandOne: 10,
+    operandTwo: 2,
+    operator: "/",
+  };
+  const calculate = async (data: any) => {
+    const resp = await calculateAPI(data);
+    if (resp.error && resp.error !== "") {
+      console.log("Error:", resp.error);
+    } else {
+      console.log("Success:", resp.result);
     }
   };
 
-  ping();
+  calculate(data);
 
   return (
     <div className="App">

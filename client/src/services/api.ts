@@ -5,16 +5,13 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  data: {
-    operandOne: 10,
-    operandTwo: 2,
-    operator: "/",
-  },
-  withCredentials: true,
 });
 
-export const pingAPI = async (): Promise<{ message: string }> => {
-  const response = await api.post("calculate");
+export const calculateAPI = async (data: any): Promise<any> => {
+  const response = await api.post("calculate", data);
+  if (response.status !== 200) {
+    throw new Error("Failed to get Calculate API");
+  }
   return response.data;
 };
 

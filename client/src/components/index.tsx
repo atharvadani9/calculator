@@ -53,30 +53,29 @@ const Calculator = (): JSX.Element => {
           backgroundColor: "#333333",
           borderRadius: 1,
           p: 2,
-          // border: "1px solid #333",
+          direction: "row",
         }}
       >
         <Grid
-          container
           sx={{
             backgroundColor: "#1a1a1a",
             borderRadius: 1,
             px: 4,
             py: 2,
             textAlign: "center",
-            direction: "row",
+            width: "100%",
           }}
         >
           <Typography>{"0"}</Typography>
         </Grid>
         {buttons.map((row, i) => (
           <Grid
-            container
             key={i}
             sx={{
               display: "flex",
               justifyContent: "center",
               pt: 2,
+              width: "100%",
             }}
           >
             {row.map((button, j) => (

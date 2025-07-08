@@ -1,41 +1,15 @@
+import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider } from "@mui/material/styles";
 import "./App.css";
-import logo from "./logo.svg";
-import { calculateAPI } from "./services/api";
+import Calculator from "./components";
+import darkTheme from "./services/theme";
 
 function App() {
-  const data = {
-    operandOne: 10,
-    operandTwo: 2,
-    operator: "/",
-  };
-  const calculate = async (data: any) => {
-    const resp = await calculateAPI(data);
-    if (resp.error && resp.error !== "") {
-      console.log("Error:", resp.error);
-    } else {
-      console.log("Success:", resp.result);
-    }
-  };
-
-  calculate(data);
-
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <Calculator />
+    </ThemeProvider>
   );
 }
 

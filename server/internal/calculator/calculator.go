@@ -43,7 +43,7 @@ func (r *Calculator) Calculate() (float64, error) {
 		}
 	case "%":
 		if *r.OperandTwo == 0 {
-			err = errors.New("cannot divide by zero")
+			err = errors.New("cannot modulo by zero")
 		} else {
 			result = float64(int(*r.OperandOne) % int(*r.OperandTwo))
 		}

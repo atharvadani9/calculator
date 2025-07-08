@@ -1,25 +1,119 @@
 import { Button, Grid, Typography } from "@mui/material";
-import { JSX } from "react";
-// import { calculateAPI } from "../services/api";
-import { buttons } from "./Config";
+import { JSX, useState } from "react";
+import { calculateAPI } from "../services/api";
+import { buttons, CalculatorState, initialCalculatorState } from "./Config";
 
 const Calculator = (): JSX.Element => {
-  // const payload = {
-  //   operandOne: 10,
-  //   operandTwo: 2,
-  //   operator: "/",
-  // };
+  const [state, setState] = useState<CalculatorState>(initialCalculatorState);
 
-  // const calculate = async (payload: any) => {
-  //   const resp = await calculateAPI(payload);
-  //   if (resp.error && resp.error !== "") {
-  //     console.log("Error:", resp.error);
-  //   } else {
-  //     console.log("Success:", resp.result);
-  //   }
-  // };
+  //when the operator button is clicked highlight it
+  const handleButtonClick = (button: string) => {
+    const isNumber = /^[0-9]$/.test(button) || button === ".";
+    const isOperator = ["/", "*", "-", "+", "%"].includes(button);
+    const isFunction = ["C", "+/-"].includes(button);
 
-  // calculate(payload);
+    if (isNumber) {
+      handleNumberClick(button);
+    } else if (isOperator) {
+      handleOperatorClick(button);
+    } else if (button === "=") {
+      handleEqualsClick();
+    } else if (isFunction) {
+      handleFunctionClick(button);
+    }
+  };
+
+  const handleNumberClick = (number: string) => {
+    if (number === "." && state.display.includes(".")) {
+      return; // Don't allow multiple decimal points
+    }
+
+    setState((prevState) => ({
+      ...prevState,
+      display:
+        prevState.waitingForOperand || prevState.display === "0"
+          ? number
+          : prevState.display + number,
+      waitingForOperand: false,
+    }));
+  };
+
+  const handleOperatorClick = (operator: string) => {
+    if (state.display === "0") {
+      return;
+    }
+
+    if (state.previousValue === null) {
+      setState((prevState) => ({
+        ...prevState,
+        previousValue: parseFloat(prevState.display),
+        operator,
+        waitingForOperand: true,
+      }));
+    } else {
+      handleEqualsClick();
+      setState((prevState) => ({
+        ...prevState,
+        operator,
+        waitingForOperand: true,
+      }));
+    }
+  };
+
+  const handleEqualsClick = async () => {
+    if (state.previousValue === null || state.operator === null) {
+      return;
+    }
+
+    const result = await calculateResult(
+      state.previousValue,
+      parseFloat(state.display),
+      state.operator
+    );
+
+    setState({
+      display: result.toString(),
+      previousValue: null,
+      operator: null,
+      waitingForOperand: true,
+    });
+  };
+
+  const handleFunctionClick = (button: string) => {
+    if (button === "C") {
+      setState((prevState) => ({
+        ...prevState,
+        display: "0",
+        previousValue: null,
+        operator: null,
+        waitingForOperand: false,
+      }));
+    } else if (button === "+/-") {
+      setState((prevState) => ({
+        ...prevState,
+        display: (parseFloat(prevState.display) * -1).toString(),
+      }));
+    }
+  };
+
+  const calculateResult = async (
+    operandOne: number,
+    operandTwo: number,
+    operator: string
+  ) => {
+    const payload = {
+      operandOne,
+      operandTwo,
+      operator,
+    };
+    const resp = await calculateAPI(payload);
+    if (resp.error && resp.error !== "") {
+      return resp.error;
+    } else {
+      console.log("Success:", resp.result);
+      return resp.result;
+    }
+  };
 
   return (
     <Grid
@@ -59,7 +153,7 @@ const Calculator = (): JSX.Element => {
             mb: 2,
           }}
         >
-          <Typography sx={{ fontSize: "2rem" }}>{"0"}</Typography>
+          <Typography sx={{ fontSize: "2rem" }}>{state.display}</Typography>
         </Grid>
         {buttons.map((row, i) => (
           <Grid
@@ -104,6 +198,7 @@ const Calculator = (): JSX.Element => {
                       backgroundColor: hoverColor,
                     },
                   }}
+                  onClick={() => handleButtonClick(button)}
                 >
                   <Typography sx={{ color: "white", fontSize: "1.5rem" }}>
                     {button}

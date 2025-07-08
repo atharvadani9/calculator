@@ -41,6 +41,12 @@ func (r *Calculator) Calculate() (float64, error) {
 		} else {
 			result = *r.OperandOne / *r.OperandTwo
 		}
+	case "%":
+		if *r.OperandTwo == 0 {
+			err = errors.New("cannot divide by zero")
+		} else {
+			result = float64(int(*r.OperandOne) % int(*r.OperandTwo))
+		}
 	default:
 		err = errors.New("invalid operator")
 	}

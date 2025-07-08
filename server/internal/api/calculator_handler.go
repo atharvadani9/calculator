@@ -13,7 +13,7 @@ type CalculatorHandler struct {
 }
 
 type CalculatorResponse struct {
-	Result float64 `json:"result,omitempty"`
+	Result float64 `json:"result"`
 	Error  string  `json:"error,omitempty"`
 }
 

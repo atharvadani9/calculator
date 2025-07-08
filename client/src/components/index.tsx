@@ -6,8 +6,27 @@ import { buttons, CalculatorState, initialCalculatorState } from "./Config";
 const Calculator = (): JSX.Element => {
   const [state, setState] = useState<CalculatorState>(initialCalculatorState);
 
+  const calculateResult = async (
+    operandOne: number,
+    operandTwo: number,
+    operator: string
+  ) => {
+    const payload = {
+      operandOne,
+      operandTwo,
+      operator,
+    };
+    const resp = await calculateAPI(payload);
+    if (resp.error && resp.error !== "") {
+      return resp.error;
+    } else {
+      console.log("Success:", resp.result);
+      return resp.result;
+    }
+  };
+
   //when the operator button is clicked highlight it
-  const handleButtonClick = (button: string) => {
+  const handleButtonClick = async (button: string) => {
     const isNumber = /^[0-9]$/.test(button) || button === ".";
     const isOperator = ["/", "*", "-", "+", "%"].includes(button);
     const isFunction = ["C", "+/-"].includes(button);
@@ -15,9 +34,9 @@ const Calculator = (): JSX.Element => {
     if (isNumber) {
       handleNumberClick(button);
     } else if (isOperator) {
-      handleOperatorClick(button);
+      await handleOperatorClick(button);
     } else if (button === "=") {
-      handleEqualsClick();
+      await handleEqualsClick();
     } else if (isFunction) {
       handleFunctionClick(button);
     }
@@ -38,7 +57,7 @@ const Calculator = (): JSX.Element => {
     }));
   };
 
-  const handleOperatorClick = (operator: string) => {
+  const handleOperatorClick = async (operator: string) => {
     if (state.display === "0") {
       return;
     }
@@ -51,9 +70,10 @@ const Calculator = (): JSX.Element => {
         waitingForOperand: true,
       }));
     } else {
-      handleEqualsClick();
+      await handleEqualsClick();
       setState((prevState) => ({
         ...prevState,
+        previousValue: parseFloat(prevState.display),
         operator,
         waitingForOperand: true,
       }));
@@ -93,25 +113,6 @@ const Calculator = (): JSX.Element => {
         ...prevState,
         display: (parseFloat(prevState.display) * -1).toString(),
       }));
-    }
-  };
-
-  const calculateResult = async (
-    operandOne: number,
-    operandTwo: number,
-    operator: string
-  ) => {
-    const payload = {
-      operandOne,
-      operandTwo,
-      operator,
-    };
-    const resp = await calculateAPI(payload);
-    if (resp.error && resp.error !== "") {
-      return resp.error;
-    } else {
-      console.log("Success:", resp.result);
-      return resp.result;
     }
   };
 

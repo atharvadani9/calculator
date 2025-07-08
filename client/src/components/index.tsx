@@ -20,12 +20,10 @@ const Calculator = (): JSX.Element => {
     if (resp.error && resp.error !== "") {
       return resp.error;
     } else {
-      console.log("Success:", resp.result);
       return resp.result;
     }
   };
 
-  //when the operator button is clicked highlight it
   const handleButtonClick = async (button: string) => {
     const isNumber = /^[0-9]$/.test(button) || button === ".";
     const isOperator = ["/", "*", "-", "+", "%"].includes(button);
@@ -54,6 +52,7 @@ const Calculator = (): JSX.Element => {
           ? number
           : prevState.display + number,
       waitingForOperand: false,
+      selectedOperator: null, // Clear operator highlight when number is entered
     }));
   };
 
@@ -68,6 +67,7 @@ const Calculator = (): JSX.Element => {
         previousValue: parseFloat(prevState.display),
         operator,
         waitingForOperand: true,
+        selectedOperator: operator,
       }));
     } else {
       await handleEqualsClick();
@@ -76,6 +76,7 @@ const Calculator = (): JSX.Element => {
         previousValue: parseFloat(prevState.display),
         operator,
         waitingForOperand: true,
+        selectedOperator: operator,
       }));
     }
   };
@@ -96,6 +97,7 @@ const Calculator = (): JSX.Element => {
       previousValue: null,
       operator: null,
       waitingForOperand: true,
+      selectedOperator: null,
     });
   };
 
@@ -107,6 +109,7 @@ const Calculator = (): JSX.Element => {
         previousValue: null,
         operator: null,
         waitingForOperand: false,
+        selectedOperator: null,
       }));
     } else if (button === "+/-") {
       setState((prevState) => ({
@@ -170,6 +173,7 @@ const Calculator = (): JSX.Element => {
               const isNumber = /^[0-9]$/.test(button) || button === ".";
               const isFunction = ["C", "+/-", "%"].includes(button);
               const isOperator = ["/", "*", "-", "+", "="].includes(button);
+              const isSelectedOperator = state.selectedOperator === button;
 
               let backgroundColor = "#222222"; // default
               let hoverColor = "#333333"; // default
@@ -178,10 +182,10 @@ const Calculator = (): JSX.Element => {
                 backgroundColor = "#424242";
                 hoverColor = "#525252";
               } else if (isFunction) {
-                backgroundColor = "#757575";
+                backgroundColor = isSelectedOperator ? "#858585" : "#757575";
                 hoverColor = "#858585";
               } else if (isOperator) {
-                backgroundColor = "#ff9500";
+                backgroundColor = isSelectedOperator ? "#ffb333" : "#ff9500";
                 hoverColor = "#ffb333";
               }
 

@@ -3,6 +3,7 @@ export interface CalculatorState {
   previousValue: number | null;
   operator: string | null;
   waitingForOperand: boolean;
+  selectedOperator: string | null;
 }
 
 export const buttons = [
@@ -18,4 +19,5 @@ export const initialCalculatorState: CalculatorState = {
   previousValue: null,
   operator: null,
   waitingForOperand: false,
+  selectedOperator: null,
 };
